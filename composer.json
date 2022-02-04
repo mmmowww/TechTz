@@ -13,7 +13,9 @@
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.4",
         "laravel/framework": "^8.0",
-        "laravel/tinker": "^2.0"
+        "laravel/tinker": "^2.0",
+        "telegram-bot/api": "^2.3",
+        "vlucas/phpdotenv": "^5.4"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
