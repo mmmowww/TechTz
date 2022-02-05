@@ -33,7 +33,10 @@ class BotController extends Controller {
 		$bot->SendSubcribeUser($sUser);
 	}
 	// Скачиваем массив и записываем только последнеие сообщения
-	public function updateMessageAllUser() {
+	public function UpdateMessageAllUser() {
 		$api = $this->Api;
+		$bot = $this->Bot;
+		$bot->EndMessage();
+		$bot->SubscribeUser();
 	}
 }
