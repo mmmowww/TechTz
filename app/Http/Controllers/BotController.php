@@ -26,9 +26,14 @@ class BotController extends Controller {
 		$bot = $this->Bot;
 		$bot->SearchSubscribeUser();
 	}
+	// Рассылка подписавшимся пользователям
 	public function SendSubcribeUser() {
 		$bot = $this->Bot;
 		$sUser = $bot->SearchSubscribeUser();
 		$bot->SendSubcribeUser($sUser);
+	}
+	// Скачиваем массив и записываем только последнеие сообщения
+	public function updateMessageAllUser() {
+		$api = $this->Api;
 	}
 }

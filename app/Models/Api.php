@@ -58,9 +58,5 @@ class Api extends Model {
 
 		}
 	}
-	// Вывести все сообщения
-	public function GetClient() {
-		return $this->client;
-	}
 
 }

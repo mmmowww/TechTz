@@ -21,3 +21,4 @@ Route::get('/create/{NameTool}', [BotController::class, 'createNewWrite']);
 Route::get('/getallusser', [BotController::class, 'GetAllMessage']);
 Route::get('/searchsubscribeuser', [BotController::class, 'SearchSubscribeUser']);
 Route::get('/sendsubscribe', [BotController::class, 'SendSubcribeUser']);
+Route::get('/subscribe', [BotController::class, 'SubscribeUser']);

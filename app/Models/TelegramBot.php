@@ -6,6 +6,7 @@ use App\Models\Api;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class TelegramBot extends Model {
 	use HasFactory;
@@ -67,18 +68,17 @@ class TelegramBot extends Model {
 
 		return $allMessageAndUserSubscribe;
 	}
+	//Рассылка всем подписавшимся
 	public function SendSubcribeUser($userArrSubscribe) {
-		$arrValue = Tool::all();
-		$arrValue = $arrValue->toArray();
+		$userArrSubscribe = DB::table("TelegrammUser")
+			->join('TelegrammUserSubscribe', 'TelegrammUser.numeroUser', '=', 'TelegrammUserSubscribe.numeroUser')
+			->get();
+		$userArrSubscribe = $userArrSubscribe->toArray();
 		$api = new Api();
-		$client = $api->GetClient();
+		$valueTool = $api->GetTool("USD");
 		foreach ($userArrSubscribe as $key => $value) {
-			$url = "https://api.telegram.org/bot" . $this->key . "/sendMessage?chat_id=" . $value["id"] . '&text=';
-			foreach ($arrValue as $key => $value) {
-				$url = $url . $value;
-				$client->request('GET', $url);
+			$url = "https://api.telegram.org/bot" . $this->key . "/sendMessage?chat_id=" . $value["numeroUser"] . '&text=' . $valueTool;
 
-			}
 		}
 	}
 	// Деграть только тогда когда сообщений слишком много
@@ -92,8 +92,77 @@ class TelegramBot extends Model {
 	public function NewUser() {
 		$api = new Api();
 		$client = $api->GetClient();
-		$client->request('GET', $url);
-
+		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$response = $client->request('GET', $url);
+		$arrayMessage = $response->getBody();
+		$newUser = array();
+		foreach ($arrayMessage as $key => $value) {
+			if ($value["message"]['text'] == "\start") {
+				$allMessageAndUserSubscribe[] = [
+					"id" => $value["message"]["from"]["id"],
+					"username" => $value["message"]["from"]["username"],
+					"ferstName" => $value["message"]["from"]["first_name"],
+					"lastName" => $value["message"]["from"]["last_name"],
+					"message" => $value["message"]['text'],
+				];
+				$url = "https://api.telegram.org/bot" . $this->key . "/sendMessage?chat_id=" . $value["message"]["from"]["id"] . '&text=' . (string) $api->GetTool("USD");
+				tooluser::UpdateOrCreate(
+					[
+						"numeroUser" => $value["message"]["from"]["id"],
+						'username' => $value["message"]["from"]["username"],
+						'ferstName' => $value["message"]["from"]["first_name"],
+						'lastName' => $value["message"]["from"]["last_name"],
+						'Lastmessage' => $value["message"]['text'],
+					]
+				);
+			}
+		}
 	}
+	// Проходимся по всем сообщениям записываем только последние
+	public function EndMessage() {
+		$api = new Api();
+		$client = $api->GetClient();
+		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$response = $client->request('GET', $url);
+		$arrayMessage = $response->getBody();
+		$newUser = array();
+		foreach ($arrayMessage as $key => $value) {
+			tooluser::UpdateOrCreate(
+				[
+					"numeroUser" => $value["message"]["from"]["id"],
+					'username' => $value["message"]["from"]["username"],
+					'ferstName' => $value["message"]["from"]["first_name"],
+					'lastName' => $value["message"]["from"]["last_name"],
+					'Lastmessage' => $value["message"]['text'],
+				]
+			);
 
+		}
+	}
+	public function SubscribeUser() {
+		$api = new Api();
+		$client = $api->GetClient();
+		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$response = $client->request('GET', $url);
+		$arrayMessage = $response->getBody();
+		$newUser = array();
+		foreach ($arrayMessage as $key => $value) {
+			if ($value["message"]['text'] == "Subscribe") {
+				tooluser::UpdateOrCreate(
+					[
+						"numeroUser" => $value["message"]["from"]["id"],
+						'username' => $value["message"]["from"]["username"],
+						'ferstName' => $value["message"]["from"]["first_name"],
+						'lastName' => $value["message"]["from"]["last_name"],
+						'Lastmessage' => $value["message"]['text'],
+					]
+				);
+				tooluser::UpdateOrCreate(
+					[
+						"numeroUser" => $value["message"]["from"]["id"],
+					]
+				);
+			}
+		}
+	}
 }
