@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class tooluser extends Model {
 	protected $table = 'tooluser';
 	protected $fillable = [
-		"numeroUser",
+		'name'
+		'value',
 	];
 	use HasFactory;
 }

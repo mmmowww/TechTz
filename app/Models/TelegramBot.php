@@ -92,7 +92,7 @@ class TelegramBot extends Model {
 	public function NewUser() {
 		$api = new Api();
 		$client = $api->GetClient();
-		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
 		$response = $client->request('GET', $url);
 		$arrayMessage = $response->getBody();
 		$newUser = array();
@@ -106,7 +106,7 @@ class TelegramBot extends Model {
 					"message" => $value["message"]['text'],
 				];
 				$url = "https://api.telegram.org/bot" . $this->key . "/sendMessage?chat_id=" . $value["message"]["from"]["id"] . '&text=' . (string) $api->GetTool("USD");
-				tooluser::UpdateOrCreate(
+				Tool::UpdateOrCreate(
 					[
 						"numeroUser" => $value["message"]["from"]["id"],
 						'username' => $value["message"]["from"]["username"],
@@ -122,12 +122,12 @@ class TelegramBot extends Model {
 	public function EndMessage() {
 		$api = new Api();
 		$client = $api->GetClient();
-		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
 		$response = $client->request('GET', $url);
 		$arrayMessage = $response->getBody();
 		$newUser = array();
 		foreach ($arrayMessage as $key => $value) {
-			tooluser::UpdateOrCreate(
+			Tool::UpdateOrCreate(
 				[
 					"numeroUser" => $value["message"]["from"]["id"],
 					'username' => $value["message"]["from"]["username"],
@@ -142,13 +142,12 @@ class TelegramBot extends Model {
 	public function SubscribeUser() {
 		$api = new Api();
 		$client = $api->GetClient();
-		$url = $url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
 		$response = $client->request('GET', $url);
 		$arrayMessage = $response->getBody();
-		$newUser = array();
 		foreach ($arrayMessage as $key => $value) {
 			if ($value["message"]['text'] == "Subscribe") {
-				tooluser::UpdateOrCreate(
+				Tool::UpdateOrCreate(
 					[
 						"numeroUser" => $value["message"]["from"]["id"],
 						'username' => $value["message"]["from"]["username"],
@@ -157,12 +156,53 @@ class TelegramBot extends Model {
 						'Lastmessage' => $value["message"]['text'],
 					]
 				);
-				tooluser::UpdateOrCreate(
+				Tool::UpdateOrCreate(
 					[
 						"numeroUser" => $value["message"]["from"]["id"],
 					]
 				);
 			}
+		}
+	}
+	public function GetHistory() {
+		$api = new Api();
+		$client = $api->GetClient();
+		$url = "https://api.telegram.org/bot" . $this->key . "/getUpdates";
+		$arrayMessage = $response->getBody();
+		$newUserHistory = array();
+		foreach ($arrayMessage as $key => $value) {
+			if ($value["message"]['text'] == "History") {
+				$newUserHistory[] = $value["message"]["from"]["id"];
+				Tool::UpdateOrCreate(
+					[
+						"numeroUser" => $value["message"]["from"]["id"],
+						'username' => $value["message"]["from"]["username"],
+						'ferstName' => $value["message"]["from"]["first_name"],
+						'lastName' => $value["message"]["from"]["last_name"],
+						'Lastmessage' => $value["message"]['text'],
+					]
+				);
+
+			}
+		}
+		$arrUserGetHistory = DB::('TelegrammUser')->where("Lastmessage","=","History" )->get();
+		$arrUserGetHistory = $arrUserGetHistory->toArray();
+		$tool = tooluser::all();
+		$tool = $tool->toArray();
+		foreach ($newUserHistory as $key => $value) {
+			$url = "https://api.telegram.org/bot" . $this->key . "sendMessage?chat_id=" . $value . "&text=";
+			foreach ($tool as $keyl => $valuel) {
+				$client->request('GET', $url.$valuel);
+			}
+		Tool::UpdateOrCreate(
+					[
+						"numeroUser" => $value["message"]["from"]["id"],
+						'username' => $value["message"]["from"]["username"],
+						'ferstName' => $value["message"]["from"]["first_name"],
+						'lastName' => $value["message"]["from"]["last_name"],
+						'Lastmessage' => "HistorySend",
+					]
+				);	
 		}
 	}
 }
