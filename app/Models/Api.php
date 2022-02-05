@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Api extends Model {
+	private $client;
+	public function __construct() {
+		$this->client = new \GuzzleHttp\Client();
+	}
 	use HasFactory;
 	public function GetTool(string $nameTool) {
-		$client = new \GuzzleHttp\Client();
+		$client = $this->client;
 		$response = $client->request('GET', 'http://www.cbr.ru/scripts/XML_daily.asp');
 		$xml = $response->getBody();
 		$xml = simplexml_load_string($xml);
@@ -24,7 +28,7 @@ class Api extends Model {
 
 	}
 	public function GetWriteTable(string $nameTool) {
-		$client = new \GuzzleHttp\Client();
+		$client = $this->client;
 		$response = $client->request('GET', 'http://www.cbr.ru/scripts/XML_daily.asp');
 		$xml = $response->getBody();
 		$xml = simplexml_load_string($xml);
@@ -54,4 +58,9 @@ class Api extends Model {
 
 		}
 	}
+	// Вывести все сообщения
+	public function GetClient() {
+		return $this->client;
+	}
+
 }

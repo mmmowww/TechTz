@@ -17,4 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
 	return view('welcome');
 });
-Route::get('/create/', [BotController::class, 'createNewWrite']);
+Route::get('/create/{NameTool}', [BotController::class, 'createNewWrite']);
+Route::get('/getallusser', [BotController::class, 'GetAllMessage']);
+Route::get('/searchsubscribeuser', [BotController::class, 'SearchSubscribeUser']);
+Route::get('/sendsubscribe', [BotController::class, 'SendSubcribeUser']);
