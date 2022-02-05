@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Api;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -80,4 +81,19 @@ class TelegramBot extends Model {
 			}
 		}
 	}
+	// Деграть только тогда когда сообщений слишком много
+	public function ClearArrayApiMessage() {
+		$url = "https://api.telegram.org/bot" . $this->key;
+		$request = new Request('GET', $url);
+		$response = $client->send($request, ['timeout' => 2]);
+
+	}
+	// Если пользователя ещё нет в бд то отправляем ему сообщение
+	public function NewUser() {
+		$api = new Api();
+		$client = $api->GetClient();
+		$client->request('GET', $url);
+
+	}
+
 }
